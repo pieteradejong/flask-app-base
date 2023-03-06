@@ -1,40 +1,42 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-
-"""
-goal: TODO app
-
-GET: get all tasks
-PUT: add task for today
-
-
-"""
-
-tasks = ["task1", "task2", "task2"]
+books_list = []
 
 @app.route('/')
-def get_all_tasks():
-    return tasks
+def index():
+    return "Hello, World."
 
-@app.route('/add', methods=['POST'])
-def add_task():
-    new_tasks = json.loads(request.data)
-    if new_tasks:
-        tasks.append(new_tasks)
-    # if error: return False
-
-    # for r in records:
-    #     if r['name'] == record['name']:
-    #         r['email'] = record['email']
-    #     new_records.append(r)
-    # with open('/tmp/data.txt', 'w') as f:
-    #     f.write(json.dumps(new_records, indent=2))
-    return True
-    
+@app.route('/<name>')
+def print_name(name):
+    return f"Hello, {name}."
 
 
+@app.route('/books', methods=['GET', 'POST'])
+def books():
+    if request.method == 'GET':
+        if len(books_list) > 0:
+            return jsonify(books_list)
+        else:
+            "Nothing Found", 404
+    if request.method == 'POST':
+        new_author = request.form['author']
+        new_lang = request.form['language']
+        new_title = request.form['title']
+        ID = books_list[-1]['id']+1
+
+        new_obj = {
+            'id': ID,
+            'author': new_author,
+            'language': new_lang,
+            'title': new_title
+        }
+
+        books_list.append(new_obj)
+
+        return jsonify(books_list), 201
 
 
-
+if __name__ == "__main__":
+    app.run()
